@@ -10,27 +10,33 @@ import io.qameta.allure.Step;
 import junit.framework.Assert;
 
 public class GoogleFunc extends BasePage {
-	
-	
+
 	@Step("Login into Google site, Capture the title and verify that Title contains Google")
-	public void titleVerify()
-	{
+	public void titleVerify() {
 		String title = getTitle();
-		ExtentReportConf.reportPassLog("Captured title as: "+title);
+		ExtentReportConf.reportPassLog("Captured title as: " + title);
 		Assert.assertEquals(title, "Google");
-		System.out.println("Title is "+title);
-		ExtentReportConf.reportPassLog("Asserted title as: "+title);
-	
+		System.out.println("Title is " + title);
+		ExtentReportConf.reportPassLog("Asserted title as: " + title);
+
 	}
-	
+
 	@Step("Searching Text as Automation in Google")
-	public void searchTest()
-	{
+	public void searchTest() {
 		driver.findElement(By.name("q")).sendKeys("Automation");
 		ExtentReportConf.reportPassLog("Entered text as Automation");
 		driver.findElement(By.name("btnK")).sendKeys(Keys.ENTER);
 		ExtentReportConf.reportPassLog("Clicked on Enter button");
-		
+
+	}
+
+	@Step("Searching Text as Automation in Google")
+	public void searchResult() {
+		String text = driver.findElement(By.xpath("//span[text()='Automation']")).getText();
+		ExtentReportConf.reportPassLog("Fetched text as: "+text);
+		Assert.assertEquals(text, "Automation");
+		ExtentReportConf.reportPassLog("Asserted search result text as: "+text);
+
 	}
 
 }
