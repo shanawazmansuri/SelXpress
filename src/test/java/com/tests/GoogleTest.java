@@ -39,5 +39,16 @@ public class GoogleTest extends BasePage {
 	{
 		gf.searchTest();
 	}
+	
+	@Test
+	@Severity(SeverityLevel.NORMAL)
+	@Description("TC Description: To verify google search result")
+	@Story("User Story 3")
+	@Feature("Search Result")
+	@Epic("003")
+	public void test3()
+	{
+		gf.searchResult();
+	}
 
 }
