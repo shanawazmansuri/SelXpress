@@ -2,6 +2,7 @@ package com.functions;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
 import com.basepage.BasePage;
 import com.utilities.ExtentReportConf;
@@ -32,10 +33,12 @@ public class GoogleFunc extends BasePage {
 
 	@Step("Searching Text as Automation in Google")
 	public void searchResult() {
-		String text = driver.findElement(By.xpath("//span[text()='Automation']")).getText();
-		ExtentReportConf.reportPassLog("Fetched text as: "+text);
+		WebElement txt = driver.findElement(By.xpath("//span[text()='Automation']"));
+		Wait(5000);
+		String text = txt.getText();
+		ExtentReportConf.reportPassLog("Fetched text as: " + text);
 		Assert.assertEquals(text, "Automation");
-		ExtentReportConf.reportPassLog("Asserted search result text as: "+text);
+		ExtentReportConf.reportPassLog("Asserted search result text as: " + text);
 
 	}
 
