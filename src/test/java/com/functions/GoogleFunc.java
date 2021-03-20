@@ -33,12 +33,18 @@ public class GoogleFunc extends BasePage {
 
 	@Step("Searching Text as Automation in Google")
 	public void searchResult() {
+
 		WebElement txt = driver.findElement(By.xpath("//span[text()='Automation']"));
 		Wait(5000);
 		String text = txt.getText();
 		ExtentReportConf.reportPassLog("Fetched text as: " + text);
 		Assert.assertEquals(text, "Automation");
 		ExtentReportConf.reportPassLog("Asserted search result text as: " + text);
+
+		String texts = driver.findElement(By.xpath("//span[text()='Automation']")).getText();
+		ExtentReportConf.reportPassLog("Fetched text as: "+text);
+		Assert.assertEquals(text, "Automation");
+		ExtentReportConf.reportPassLog("Asserted search result text as: "+text);
 
 	}
 
