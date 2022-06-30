@@ -2,13 +2,13 @@ package com.basepage;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
@@ -21,8 +21,12 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.idealized.log.model.LogEntry;
+import org.openqa.selenium.devtools.v101.log.Log;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -34,9 +38,14 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 
+import com.aventstack.extentreports.ExtentTest;
 import com.config.PropFile;
 import com.utilities.ExtentReportConf;
 import com.utilities.WebEventListener;
@@ -50,7 +59,9 @@ public class BasePage {
 	public static WebEventListener eventListener;
 	public static String path = System.getProperty("user.dir");
 	public String className = this.getClass().getSimpleName();
-	PropFile pro = new PropFile();
+	public PropFile pro = new PropFile();
+	public ExtentTest browser;
+	public DevTools devTools; 
 
 	public WebDriver browser(String browsername, String url) {
 
@@ -61,6 +72,8 @@ public class BasePage {
 
 			WebDriverManager.chromedriver().setup();
 			driver = new ChromeDriver();
+			devTools = ((ChromeDriver)driver).getDevTools();
+			consoleLogs();
 		} else if (browsername.equalsIgnoreCase("IE")) {
 
 			WebDriverManager.iedriver().setup();
@@ -69,7 +82,8 @@ public class BasePage {
 
 			WebDriverManager.edgedriver().setup();
 			driver = new EdgeDriver();
-
+			devTools = ((EdgeDriver)driver).getDevTools();
+			consoleLogs();
 		}
 
 		e_driver = new EventFiringWebDriver(driver);
@@ -147,6 +161,18 @@ public class BasePage {
 		prefs.put("profile.default_content_setting_values", images);
 		options.setExperimentalOption("prefs", prefs);
 	}
+	
+	public void consoleLogs()
+	{
+		
+		devTools.createSession();
+		devTools.send(Log.enable());
+		devTools.addListener(Log.entryAdded(), LogEntry->{
+			System.out.println("***Log Level***:- "+LogEntry.getLevel());
+			System.out.println("***Log Text***:- "+LogEntry.getText());
+			
+		});
+	}
 
 	public WebDriver existingBrowser() {
 
@@ -206,20 +232,13 @@ public class BasePage {
 
 	// Open Tab in Browser//
 	public void openTab() {
-		driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL + "t");
-
-	}
-
-	// SwitchtoNextTab//
-	public void switchtoNextTab() {
-		driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL + "\t");
+		driver.switchTo().newWindow(WindowType.TAB);
 
 	}
 
 	// Open New Window//
 	public void openNewWindow() {
-		driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL + "n");
-
+		driver.switchTo().newWindow(WindowType.WINDOW);
 	}
 
 	// Accept Alert//
@@ -341,82 +360,101 @@ public class BasePage {
 	}
 
 	// Locators 1 //
-	public WebElement id(String locator) {
+	public static WebElement id(String locator) {
 		WebElement element = driver.findElement(By.id(locator));
 		return element;
 	}
 
-	public WebElement cssSelector(String locator) {
+	public static WebElement cssSelector(String locator) {
 		WebElement element = driver.findElement(By.cssSelector(locator));
 		return element;
 	}
 
-	public WebElement tagName(String locator) {
+	public static WebElement tagName(String locator) {
 		WebElement element = driver.findElement(By.tagName(locator));
 		return element;
 	}
 
-	public WebElement name(String locator) {
+	public static WebElement name(String locator) {
 		WebElement element = driver.findElement(By.name(locator));
 		return element;
 	}
 
-	public WebElement linkText(String locator) {
+	public static WebElement linkText(String locator) {
 		WebElement element = driver.findElement(By.linkText(locator));
 		return element;
 	}
 
-	public WebElement partialLinkText(String locator) {
+	public static WebElement partialLinkText(String locator) {
 		WebElement element = driver.findElement(By.partialLinkText(locator));
 		return element;
 	}
 
-	public WebElement xpath(String locator) {
+	public static WebElement xpath(String locator) {
 		WebElement element = driver.findElement(By.xpath(locator));
 		return element;
 	}
 
-	public WebElement className(String locator) {
+	public static WebElement className(String locator) {
 		WebElement element = driver.findElement(By.className(locator));
 		return element;
 	}
 
-	public List<WebElement> elements(String xpath) {
+	public static List<WebElement> elements(String xpath) {
 
 		List<WebElement> elements = driver.findElements(By.xpath(xpath));
 		return elements;
 	}
+	
+	
+	public WebElement getElement(String identifierType, String identifierValue)
+	{
+		
+		switch(identifierType)
+		{
+		case "ID":
+			return driver.findElement(By.id(identifierValue));
+			
+		case "CSS":
+			return driver.findElement(By.cssSelector(identifierValue));
+			
+		case "TAGNAME":
+			return driver.findElement(By.tagName(identifierValue));
+			
+		case "XPATH":
+			return driver.findElement(By.xpath(identifierValue));
+			
+		case "NAME":
+			return driver.findElement(By.name(identifierValue));
+			
+		case "CLASSNAME":
+			return driver.findElement(By.className(identifierValue));
+			default:
+				return null;
+		
+		}
+	}
+	
+	
+	public List<WebElement> getElements(String identifierType, String identifierValue)
+	{
+		
+		switch(identifierType)
+		{
+		case "ID":
+			return driver.findElements(By.id(identifierValue));
+				
+		case "TAGNAME":
+			return driver.findElements(By.tagName(identifierValue));
+			
+		case "XPATH":
+			return driver.findElements(By.xpath(identifierValue));
+			default:
+				return null;
+		
+		}
+	}
 
-	// Locator 2 ///
-	/*
-	 * public WebElement locator(String locatorTpye, String value) { By by;
-	 * WebElement element; switch (locatorTpye) { case "id": by = By.id(value);
-	 * element = driver.findElement(by); break; case "name": by = By.name(value);
-	 * element = driver.findElement(by); break; case "xpath": by = By.xpath(value);
-	 * element = driver.findElement(by); break; case "css": by =
-	 * By.cssSelector(value); element = driver.findElement(by); break; case
-	 * "linkText": by = By.linkText(value); element = driver.findElement(by); break;
-	 * case "partialLinkText": by = By.partialLinkText(value); element =
-	 * driver.findElement(by); break; case "tagName": by = By.tagName(value);
-	 * element = driver.findElement(by); break; default: by = null; element = null;
-	 * break; } return element; }
-	 */
-
-	/*
-	 * public static By getLocator(String locator, BY_TYPE type,WebDriver driver){
-	 * switch (type) { case BY_XPATH: return By.xpath(locator); case BY_LINKTEXT:
-	 * return By.linkText(locator); case BY_ID: return By.id(locator); case
-	 * BY_CSSSELECTOR: return By.cssSelector(locator); case BY_CLASSNAME: return
-	 * By.className(locator); case BY_NAME: return By.name(locator); case
-	 * BY_PARTIALLINKTEXT: return By.partialLinkText(locator); case BY_TAGNAME:
-	 * return By.tagName(locator);
-	 * 
-	 * 
-	 * } throw new IllegalArgumentException(
-	 * "Invalid By Type, Please provide correct locator type" );
-	 * 
-	 * }
-	 */
 
 	// GetTitle///
 	public String getTitle() {
@@ -446,58 +484,68 @@ public class BasePage {
 
 	// Implicit Wait///
 	public void implicitWait(int time) {
-		driver.manage().timeouts().implicitlyWait(time, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(time));
 	}
 
 	// Explicit Wait//
 	public void waitToClick(WebElement element, int time) {
-		WebDriverWait wait = new WebDriverWait(driver, time);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		wait.until(ExpectedConditions.elementToBeClickable(element));
 	}
 
 	public void waitTovisibleElement(WebElement element, int time) {
-		WebDriverWait wait = new WebDriverWait(driver, time);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		wait.until(ExpectedConditions.visibilityOf(element));
 	}
 
 	public void waitAlertPresent(int time) {
-		WebDriverWait wait = new WebDriverWait(driver, time);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		wait.until(ExpectedConditions.alertIsPresent());
 	}
 
 	public void waitcontainTitle(int time, String title) {
-		WebDriverWait wait = new WebDriverWait(driver, time);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		wait.until(ExpectedConditions.titleContains(title));
 
 	}
 
 	public void waitcontaTitleIs(int time, String title) {
-		WebDriverWait wait = new WebDriverWait(driver, time);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		wait.until(ExpectedConditions.titleIs(title));
 
 	}
 
 	public void waitPresenceOfElement(int time, By element) {
-		WebDriverWait wait = new WebDriverWait(driver, time);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		wait.until(ExpectedConditions.presenceOfElementLocated(element));
 
 	}
 
 	public void waitPageLoadTimeout(int time) {
-		driver.manage().timeouts().pageLoadTimeout(time, TimeUnit.SECONDS);
+		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(time));
 
 	}
 
 	// Explicit Wait 2//
-	public static void explicitWait(WebElement element, String condition, int inttimeoutinseconds) {
+	public static void explicitWait(WebElement element, String condition, int time) {
 
-		WebDriverWait webDriverWait = new WebDriverWait(driver, inttimeoutinseconds);
+		WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(time));
 		try {
 			if (condition.equalsIgnoreCase("visibility")) {
 				webDriverWait.until(ExpectedConditions.visibilityOf(element));
 
 			} else if (condition.equalsIgnoreCase("clickable")) {
 				webDriverWait.until(ExpectedConditions.elementToBeClickable(element));
+
+			}
+
+			else if (condition.equalsIgnoreCase("selected")) {
+				webDriverWait.until(ExpectedConditions.elementToBeSelected(element));
+
+			}
+
+			else if (condition.equalsIgnoreCase("alertpresent")) {
+				webDriverWait.until(ExpectedConditions.alertIsPresent());
 
 			}
 
@@ -526,8 +574,7 @@ public class BasePage {
 
 			File src = ts.getScreenshotAs(OutputType.FILE);
 
-			FileUtils.copyFile(src,
-					new File("C:\\Bishwa\\TATACAPITAL\\ScreenShots\\" + System.currentTimeMillis() + ".png"));
+			FileUtils.copyFile(src, new File(".//ScreenShots" + System.currentTimeMillis() + ".png"));
 
 			System.out.println("Screenshot taken");
 		} catch (Exception e) {
@@ -916,7 +963,7 @@ public class BasePage {
 	// Double Click
 	public void doubleClick(WebElement element) {
 		Actions action = new Actions(driver);
-		action.doubleClick(element);
+		action.doubleClick(element).build().perform();
 	}
 
 	// Release
@@ -928,13 +975,19 @@ public class BasePage {
 	// Right Click
 	public void rightClick(WebElement element) {
 		Actions action = new Actions(driver);
-		action.contextClick(element);
+		action.contextClick(element).build().perform();
 	}
 
 	// Move to Element
 	public void movetoElement(WebElement element) {
 		Actions action = new Actions(driver);
 		action.moveToElement(element);
+	}
+
+	// Action Click
+	public void clickAction(WebElement element) {
+		Actions action = new Actions(driver);
+		action.click(element);
 	}
 
 	public static void clickUsingJavascriptExecutor(WebElement element, WebDriver driver) {
@@ -978,32 +1031,24 @@ public class BasePage {
 		jse.executeScript("window.scrollBy(0,-250)");
 	}
 
-	/*
-	 * @BeforeMethod public void setUp() throws MalformedURLException {
-	 * 
-	 * ExtentReportConf.reportSetUp(className); existingBrowser();
-	 * ExtentReportConf.reportInfoLog("Opened Browser Successfully");
-	 * implicitWait(30); }
-	 */
-
 	@BeforeMethod
 	public void setUp() throws MalformedURLException {
 
 		ExtentReportConf.reportSetUp(className);
+		browser = ExtentReportConf.createTest("Browser Sessions");
 		browser(pro.prop.getProperty("browser"), (pro.prop.getProperty("url")));
-		ExtentReportConf.reportInfoLog("Opened Browser Successfully");
+		browser.info("Opened Browser Successfully");
 		maximizeBrowser();
-		ExtentReportConf.reportInfoLog("Maximized the Browser");
-		deleteCookies();
+		browser.info("Maximized the Browser");
 		implicitWait(5);
 		waitPageLoadTimeout(60);
 
 	}
 
-	@AfterMethod
-	public void tearDown() {
-		quitBrowser();
-		ExtentReportConf.reportInfoLog("Browser Closed Successfully");
-		ExtentReportConf.reportTearDown();
-	}
+	/*
+	 * @AfterMethod public void tearDown() { quitBrowser();
+	 * browser.info("Browser Closed Successfully");
+	 * ExtentReportConf.reportTearDown(); }
+	 */
+
 }

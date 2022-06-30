@@ -2,9 +2,11 @@ package com.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -16,9 +18,9 @@ public class ExcelUtils {
 	public ExcelUtils(String excelPath, String sheetName) {
 
 		try {
-			File src = new File(excelPath);
-			FileInputStream finput = new FileInputStream(src);
-			workbook = new HSSFWorkbook(finput);
+			//File src = new File(excelPath);
+			InputStream file = new FileInputStream(excelPath);
+			workbook = new HSSFWorkbook(new POIFSFileSystem(file));
 			sheet = workbook.getSheet(sheetName);
 		} catch (Exception e) {
 

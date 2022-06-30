@@ -1,5 +1,9 @@
 package com.utilities;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
+import org.testng.IAnnotationTransformer;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ISuite;
@@ -11,6 +15,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.ITestAnnotation;
 import org.testng.annotations.Test;
 
 import com.basepage.BasePage;
@@ -18,7 +23,7 @@ import com.basepage.BasePage;
 
 
 
-public class TestngListeners extends BasePage implements ITestListener, ISuiteListener, IInvokedMethodListener {
+public class TestngListeners extends BasePage implements ITestListener, ISuiteListener, IInvokedMethodListener,IAnnotationTransformer {
 
 	// This belongs to ISuiteListener and will execute before the Suite start
 
@@ -198,5 +203,10 @@ public class TestngListeners extends BasePage implements ITestListener, ISuiteLi
 
 		System.out.println("Execution of After method is carring on");
 
+	}
+
+	@Override
+	public void transform(ITestAnnotation annotation, Class testClass, Constructor testConstructor, Method testMethod) {
+		annotation.setRetryAnalyzer(RetryAnalyser.class);	
 	}
 }

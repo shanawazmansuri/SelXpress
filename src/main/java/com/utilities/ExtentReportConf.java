@@ -2,68 +2,65 @@ package com.utilities;
 
 import java.net.MalformedURLException;
 
-import com.relevantcodes.extentreports.ExtentReports;
-import com.relevantcodes.extentreports.ExtentTest;
-import com.relevantcodes.extentreports.LogStatus;
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
 public class ExtentReportConf {
+	public static ExtentSparkReporter reporter;
+	public static ExtentReports extent;
 	public static ExtentTest test;
-	public static ExtentReports report;
-	
 
 	public static void reportSetUp(String Classname) throws MalformedURLException {
-		report = new ExtentReports(System.getProperty("user.dir") + "/TestReport/" + Classname + ".html", false);
-		report.addSystemInfo("Environment", "Pre-Production").addSystemInfo("User", "Shanawaz");
-		test = report.startTest(Classname);
+
+		reporter = new ExtentSparkReporter(System.getProperty("user.dir") + "/TestReport/" + Classname + ".html");
+		reporter.config().setReportName("Automation Report");
+		reporter.config().setDocumentTitle("Test Results");
+
+		extent = new ExtentReports();
+		extent.attachReporter(reporter);
+		extent.setSystemInfo("Tester", "Shanawaz Mansuri");
+		extent.setSystemInfo("Environment", "QA Env");
 
 	}
 
 	public static void reportTearDown() {
-		report.endTest(test);
-		report.flush();
-		report.close();
+		extent.flush();
+	}
+	
+	public static ExtentTest createTest(String createTest) {
+		  ExtentTest test = ExtentReportConf.extent.createTest(createTest);
+		  return test;
+		  
+	 
+
+
+/*	public static void createTest(String testName, String testType, String log) {
+		test = extent.createTest(testName);
+
+		if (testType.equalsIgnoreCase("Pass")) {
+			test.pass(log);
+
+		}
+
+		else if (testType.equalsIgnoreCase("Fail")) {
+			test.pass(log);
+		}
+
+		else if (testType.equalsIgnoreCase("Info")) {
+			test.info(log);
+		}
+
+		else if (testType.equalsIgnoreCase("Warning")) {
+			test.warning(log);
+		}
+
+		else if (testType.equalsIgnoreCase("Skip")) {
+			test.skip(log);
+		} else {
+			System.out.println("Incorrect Log");
+		}*/
+
 	}
 
-	public static void reportPassLog(String log) {
-		test.log(LogStatus.PASS, log,"");
-	}
-
-	public static void reportPassLogwithSS(String log, String ss) {
-		test.log(LogStatus.PASS, log, ExtentReportConf.test.addScreenCapture(ss));
-
-	}
-
-	public static void reportFailLog(String log) {
-		test.log(LogStatus.FAIL, log,"");
-	}
-
-	public static void reportFailLogwithSS(String log, String ss) {
-		test.log(LogStatus.FAIL,log,ExtentReportConf.test.addScreenCapture(ss));
-
-	}
-	
-	public static void reportInfoLog(String log) {
-		test.log(LogStatus.INFO, log,"");
-	}
-	
-	public static void reportSkipLog(String log) {
-		test.log(LogStatus.SKIP, log,"");
-	}
-	
-	public static void reportErrorLog(String log) {
-		test.log(LogStatus.ERROR, log,"");
-	}
-	
-	public static void reportFatalLog(String log) {
-		test.log(LogStatus.FATAL, log,"");
-	}
-	
-	public static void reportWarningLog(String log) {
-		test.log(LogStatus.WARNING, log,"");
-	}
-	
-	public static void reportUnknownLog(String log) {
-		test.log(LogStatus.UNKNOWN, log,"");
-	}
-	
 }
