@@ -7,8 +7,9 @@ stages{
 stage('Build')
 {
 steps{
-bat "mvn clean"
-}	
+echo 'Building the code'
+}
+	
 }
 
 stage('Deploy')	
@@ -21,14 +22,14 @@ echo 'Deploying the code'
 stage('Test')
 {
 steps{
-bat "mvn test"
+echo Testing the code'
 }
 }
 
 stage('Unit Test')
 {
 steps{
-bat "mvn compile"
+echo 'Conducting Unit testing'
 }
 }
 
