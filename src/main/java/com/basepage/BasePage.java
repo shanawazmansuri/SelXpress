@@ -25,7 +25,6 @@ import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.idealized.log.model.LogEntry;
 import org.openqa.selenium.devtools.v101.log.Log;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -38,12 +37,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
 
 import com.aventstack.extentreports.ExtentTest;
 import com.config.PropFile;
@@ -407,53 +401,41 @@ public class BasePage {
 	}
 	
 	
-	public WebElement getElement(String identifierType, String identifierValue)
-	{
-		
-		switch(identifierType)
-		{
-		case "ID":
-			return driver.findElement(By.id(identifierValue));
-			
-		case "CSS":
-			return driver.findElement(By.cssSelector(identifierValue));
-			
-		case "TAGNAME":
-			return driver.findElement(By.tagName(identifierValue));
-			
-		case "XPATH":
-			return driver.findElement(By.xpath(identifierValue));
-			
-		case "NAME":
-			return driver.findElement(By.name(identifierValue));
-			
-		case "CLASSNAME":
-			return driver.findElement(By.className(identifierValue));
-			default:
-				return null;
-		
-		}
-	}
+	/*
+	 * public WebElement getElement(String identifierType, String identifierValue) {
+	 * 
+	 * switch(identifierType) { case "ID": return
+	 * driver.findElement(By.id(identifierValue));
+	 * 
+	 * case "CSS": return driver.findElement(By.cssSelector(identifierValue));
+	 * 
+	 * case "TAGNAME": return driver.findElement(By.tagName(identifierValue));
+	 * 
+	 * case "XPATH": return driver.findElement(By.xpath(identifierValue));
+	 * 
+	 * case "NAME": return driver.findElement(By.name(identifierValue));
+	 * 
+	 * case "CLASSNAME": return driver.findElement(By.className(identifierValue));
+	 * default: return null;
+	 * 
+	 * } }
+	 */
 	
 	
-	public List<WebElement> getElements(String identifierType, String identifierValue)
-	{
-		
-		switch(identifierType)
-		{
-		case "ID":
-			return driver.findElements(By.id(identifierValue));
-				
-		case "TAGNAME":
-			return driver.findElements(By.tagName(identifierValue));
-			
-		case "XPATH":
-			return driver.findElements(By.xpath(identifierValue));
-			default:
-				return null;
-		
-		}
-	}
+	/*
+	 * public List<WebElement> getElements(String identifierType, String
+	 * identifierValue) {
+	 * 
+	 * switch(identifierType) { case "ID": return
+	 * driver.findElements(By.id(identifierValue));
+	 * 
+	 * case "TAGNAME": return driver.findElements(By.tagName(identifierValue));
+	 * 
+	 * case "XPATH": return driver.findElements(By.xpath(identifierValue)); default:
+	 * return null;
+	 * 
+	 * } }
+	 */
 
 
 	// GetTitle///
